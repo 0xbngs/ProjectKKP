@@ -18,6 +18,7 @@ if (!isset($_SESSION['id_user'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 </head>
+
 <body style="background-color:#f3f6fa;">
 <div class="container mt-4">
   <div class="card shadow border-0">
@@ -35,7 +36,8 @@ if (!isset($_SESSION['id_user'])) {
 
       <form method="POST" action="saverab.php">
         <div class="tab-content">
-          <!-- Tab Info -->
+          
+          <!-- =================== TAB INFO =================== -->
           <div class="tab-pane fade show active" id="info">
             <div class="row mb-3">
               <div class="col-md-6">
@@ -49,32 +51,25 @@ if (!isset($_SESSION['id_user'])) {
               <div class="col-md-6">
                 <label>Number of Units</label>
                 <input type="number" name="unit" class="form-control mb-2" required>
-                <label>Category</label>
-                <input type="text" name="category" class="form-control mb-2">
                 <label>Notes</label>
-                <textarea name="notes" class="form-control"></textarea>
+                <textarea name="notes" class="form-control" placeholder="Keterangan tambahan..."></textarea>
               </div>
             </div>
           </div>
 
-          <!-- Tab Budget -->
+          <!-- =================== TAB BUDGET (BARU) =================== -->
           <div class="tab-pane fade" id="budget">
-            <div id="budget-fields">
-              <div class="row mb-2">
-                <div class="col-md-3"><input name="material_name[]" class="form-control" placeholder="Material"></div>
-                <div class="col-md-2"><input name="unit[]" class="form-control" placeholder="Unit"></div>
-                <div class="col-md-2"><input name="quantity[]" type="number" class="form-control" placeholder="Qty"></div>
-                <div class="col-md-2"><input name="unit_price[]" type="number" class="form-control" placeholder="Harga Satuan"></div>
-                <div class="col-md-2"><input name="total_cost[]" type="number" class="form-control" placeholder="Total"></div>
-                <div class="col-md-1 text-center"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.row').remove()">🗑</button></div>
-              </div>
+            <div id="budget-container">
+              <!-- kategori akan muncul di sini -->
             </div>
-            <button type="button" id="addRow" class="btn btn-outline-success btn-sm mt-2"><i class="bi bi-plus"></i> Tambah Baris</button>
+            <button type="button" id="addCategory" class="btn btn-success mt-3">
+              <i class="bi bi-plus-circle"></i> Tambah Kategori
+            </button>
           </div>
 
-          <!-- Tab Additional -->
+          <!-- =================== TAB ADDITIONAL =================== -->
           <div class="tab-pane fade" id="additional">
-            <textarea name="additional_info" class="form-control" rows="4" placeholder="Tambahan keterangan atau biaya lain..."></textarea>
+            <textarea name="additional_info" class="form-control" rows="4" placeholder="Tambahan biaya lain atau catatan..."></textarea>
           </div>
         </div>
 
@@ -86,21 +81,153 @@ if (!isset($_SESSION['id_user'])) {
   </div>
 </div>
 
+<!-- =============== MODAL PILIH MATERIAL =============== -->
+<div class="modal fade" id="materialModal" tabindex="-1" aria-labelledby="materialModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content shadow">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="materialModalLabel"><i class="bi bi-box-seam"></i> Pilih Material</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <!-- 🔍 Search bar -->
+        <div class="mb-3">
+          <input type="text" id="searchMaterial" class="form-control" placeholder="🔍 Cari nama material, spesifikasi, atau supplier...">
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle" id="tableMaterial">
+            <thead class="table-primary text-center">
+              <tr>
+                <th>Nama Material</th>
+                <th>Spesifikasi</th>
+                <th>Unit</th>
+                <th>Harga (Rp)</th>
+                <th>Supplier</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php
+              $qMaterial = mysqli_query($conn, "
+                SELECT m.id_material, m.name, m.specification, m.unit, m.price, u.nama AS supplier_name
+                FROM material m 
+                JOIN users u ON m.id_user = u.id_user
+                ORDER BY m.name ASC
+              ");
+              while($mat = mysqli_fetch_assoc($qMaterial)): ?>
+              <tr>
+                <td><?= htmlspecialchars($mat['name']) ?></td>
+                <td><?= htmlspecialchars($mat['specification']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($mat['unit']) ?></td>
+                <td class="text-end"><?= number_format($mat['price']) ?></td>
+                <td><?= htmlspecialchars($mat['supplier_name']) ?></td>
+                <td class="text-center">
+                  <button type="button" class="btn btn-success btn-sm selectMaterial"
+                    data-name="<?= htmlspecialchars($mat['name']) ?>"
+                    data-unit="<?= htmlspecialchars($mat['unit']) ?>"
+                    data-price="<?= htmlspecialchars($mat['price']) ?>">
+                    Pilih
+                  </button>
+                </td>
+              </tr>
+              <?php endwhile; ?>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-document.getElementById('addRow').addEventListener('click', () => {
-  const div = document.createElement('div');
-  div.className = 'row mb-2';
-  div.innerHTML = `
-    <div class="col-md-3"><input name="material_name[]" class="form-control" placeholder="Material"></div>
-    <div class="col-md-2"><input name="unit[]" class="form-control" placeholder="Unit"></div>
-    <div class="col-md-2"><input name="quantity[]" type="number" class="form-control" placeholder="Qty"></div>
-    <div class="col-md-2"><input name="unit_price[]" type="number" class="form-control" placeholder="Harga Satuan"></div>
-    <div class="col-md-2"><input name="total_cost[]" type="number" class="form-control" placeholder="Total"></div>
-    <div class="col-md-1 text-center"><button type="button" class="btn btn-outline-danger btn-sm" onclick="this.closest('.row').remove()">🗑</button></div>
+let currentRow = null;
+
+// Ketika tombol search ditekan
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.openMaterialModal')) {
+    currentRow = e.target.closest('.row');
+  }
+});
+
+// Ketika tombol "Pilih" ditekan dari modal
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('selectMaterial')) {
+    const name  = e.target.getAttribute('data-name');
+    const unit  = e.target.getAttribute('data-unit');
+    const price = e.target.getAttribute('data-price');
+
+    if (currentRow) {
+      currentRow.querySelector('.material-input').value = name;
+      currentRow.querySelector('input[name="unit[]"]').value = unit;
+      currentRow.querySelector('input[name="unit_price[]"]').value = price;
+      currentRow.querySelector('input[name="quantity[]"]').value = 1;
+      currentRow.querySelector('input[name="total_cost[]"]').value = price;
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('materialModal'));
+    modal.hide();
+  }
+});
+
+// ======================== TAMBAH KATEGORI ========================
+document.getElementById('addCategory').addEventListener('click', () => {
+  const container = document.getElementById('budget-container');
+  const block = document.createElement('div');
+  block.className = 'category-block border p-3 mb-4 rounded bg-light';
+  block.innerHTML = `
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <input type="text" name="category[]" class="form-control w-50" placeholder="Masukkan nama kategori (contoh: PEKERJAAN LANTAI)">
+      <button type="button" class="btn btn-outline-danger btn-sm removeCategory">🗑 Hapus Kategori</button>
+    </div>
+    <div class="category-items"></div>
+    <button type="button" class="btn btn-outline-primary btn-sm addItem mt-2"><i class="bi bi-plus"></i> Tambah Material</button>
   `;
-  document.getElementById('budget-fields').appendChild(div);
+  container.appendChild(block);
+});
+
+// ======================== TAMBAH ITEM MATERIAL ========================
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('addItem')) {
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'row mb-2';
+    itemDiv.innerHTML = `
+      <div class="col-md-3 d-flex align-items-center">
+        <input name="material_name[]" class="form-control me-1 material-input" placeholder="Material" >
+        <button type="button" class="btn btn-outline-primary btn-sm openMaterialModal" data-bs-toggle="modal" data-bs-target="#materialModal">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+      <div class="col-md-1"><input name="unit[]" class="form-control" placeholder="Unit"></div>
+      <div class="col-md-1"><input name="quantity[]" type="number" class="form-control" placeholder="Qty"></div>
+      <div class="col-md-2"><input name="unit_price[]" type="number" class="form-control" placeholder="Harga Satuan"></div>
+      <div class="col-md-2"><input name="total_cost[]" type="number" class="form-control" placeholder="Total"></div>
+      <div class="col-md-1 text-center"><button type="button" class="btn btn-outline-danger btn-sm removeItem">🗑</button></div>
+    `;
+    e.target.closest('.category-block').querySelector('.category-items').appendChild(itemDiv);
+  }
+});
+
+// ======================== HAPUS KATEGORI / ITEM ========================
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('removeCategory')) {
+    e.target.closest('.category-block').remove();
+  }
+  if (e.target.classList.contains('removeItem')) {
+    e.target.closest('.row').remove();
+  }
+});
+
+// ======================== SEARCH MATERIAL REALTIME ========================
+document.getElementById('searchMaterial').addEventListener('keyup', function() {
+  const searchValue = this.value.toLowerCase();
+  const rows = document.querySelectorAll('#tableMaterial tbody tr');
+  rows.forEach(row => {
+    const text = row.innerText.toLowerCase();
+    row.style.display = text.includes(searchValue) ? '' : 'none';
+  });
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

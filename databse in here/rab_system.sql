@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 13, 2025 at 04:53 PM
+-- Generation Time: Oct 14, 2025 at 09:14 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -42,7 +42,10 @@ CREATE TABLE `material` (
 --
 
 INSERT INTO `material` (`id_material`, `id_user`, `name`, `specification`, `unit`, `quantity`, `price`) VALUES
-(1, 1, 'baja ringan banget', '8 mili', '10 meter', 100, 75000);
+(1, 1, 'baja ringan banget', '8 mili', '10 meter', 100, 75000),
+(2, 3, 'pasir', 'pasir pantai', '5 sak', 5, 100000),
+(3, 3, 'Genteng', 'buat latihan silat', 'pcs', 16, 90000),
+(4, 6, 'semen', 'kaki roda', 'sak', 9, 80000);
 
 -- --------------------------------------------------------
 
@@ -60,8 +63,18 @@ CREATE TABLE `rab` (
   `jumlahTotal` int(11) DEFAULT 0,
   `pembulatan` int(11) DEFAULT 0,
   `permeterpersegi` int(11) DEFAULT 0,
-  `timestamps` timestamp NOT NULL DEFAULT current_timestamp()
+  `timestamps` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rab`
+--
+
+INSERT INTO `rab` (`id_rab`, `id_user`, `project_name`, `unit`, `type`, `location`, `jumlahTotal`, `pembulatan`, `permeterpersegi`, `timestamps`, `created_at`) VALUES
+('RAB-68edf61698053', 1, 'testing', 1, 'a2', 'jakarte', 0, 0, 0, '2025-10-14 07:04:54', '2025-10-14 07:04:54'),
+('RAB-68edf68eb5487', 1, 'Tester cuyys', 1, 'a22', 'jakartea', 0, 0, 0, '2025-10-14 07:06:54', '2025-10-14 07:06:54'),
+('RAB-68edf7f12326d', 1, 'tester1', 1, '3', 'bandung', 0, 0, 0, '2025-10-14 07:12:49', '2025-10-14 07:12:49');
 
 -- --------------------------------------------------------
 
@@ -81,6 +94,17 @@ CREATE TABLE `rab_detail` (
   `totalCost` int(11) DEFAULT NULL,
   `timestamps` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `rab_detail`
+--
+
+INSERT INTO `rab_detail` (`id`, `id_rab`, `id_material`, `category`, `material_name`, `unit`, `quantity`, `unitPrice`, `totalCost`, `timestamps`) VALUES
+(3, 'RAB-68edf61698053', NULL, 'modern', 'genteng', 'pcs', 50, 10003, 100000, '2025-10-14 07:04:54'),
+(4, 'RAB-68edf68eb5487', NULL, 'moderna', 'semen', 'sak', 14, 100000, 10000000, '2025-10-14 07:06:54'),
+(5, 'RAB-68edf68eb5487', NULL, 'moderna', 'baja', 'batang', 80, 81811, 8188111, '2025-10-14 07:06:54'),
+(6, 'RAB-68edf7f12326d', NULL, 'modern', 'genteng', 'pcs', 11, 10000, 100000, '2025-10-14 07:12:49'),
+(7, 'RAB-68edf7f12326d', NULL, 'modern', 'baja ringan', 'batang', 15, 50000, 6000000, '2025-10-14 07:12:49');
 
 -- --------------------------------------------------------
 
@@ -103,9 +127,9 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id_user`, `nama`, `username`, `password`, `role`) VALUES
 (1, 'Administrator', 'admin', '$2y$10$4UXRm6igUL6NsghE130kRu/B88GMpk..OYxB4qbV32dCkq2Wm7rAy', 'admin'),
 (2, 'RBA User', 'userrba', '$2y$10$4UXRm6igUL6NsghE130kRu/B88GMpk..OYxB4qbV32dCkq2Wm7rAy', 'user_rba'),
-(3, 'Supplier A', 'supplier', '$2y$10$4UXRm6igUL6NsghE130kRu/B88GMpk..OYxB4qbV32dCkq2Wm7rAy', 'supplier'),
+(3, 'Supplier A', 'supplier', '$2y$10$9cezUmwRu0ilQKXTQVc.kuMpJDL/UWKwYLuHuPxdFQOh.yir7/uee', 'supplier'),
 (5, 'abiyusofyan', 'abiyuoke', '$2y$10$BLzg6Bovd3IHh3pJBKqf1eFZfs./stbyFLGfOmDLg72KNIntD7vNO', 'user_rba'),
-(6, 'supplier 2', 'supplier2a', '$2y$10$RRAEyd3E/z2JBeHSxsQe6.cq8dsXPWRzGQEEyQaklaSDRxrWTLTrW', 'supplier');
+(6, 'supplier 2', 'supplier2a', '$2y$10$e89pvPSyDOVKO4.ArsM43O/4LHZvpRypAIjwe8lYxyuAIK1wEGWx2', 'supplier');
 
 --
 -- Indexes for dumped tables
@@ -148,13 +172,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `material`
 --
 ALTER TABLE `material`
-  MODIFY `id_material` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_material` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `rab_detail`
 --
 ALTER TABLE `rab_detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`

@@ -14,26 +14,50 @@ $role = $_SESSION['role'];
 
 // === CREATE MATERIAL ===
 if (isset($_POST['create'])) {
-    $name = $_POST['name'];
-    $spec = $_POST['specification'];
-    $unit = $_POST['unit'];
-    $qty  = $_POST['quantity'];
-    $price = $_POST['price'];
+    $name = mysqli_real_escape_string($conn, $_POST['name']);
+    $spec = mysqli_real_escape_string($conn, $_POST['specification']);
+    $unit = mysqli_real_escape_string($conn, $_POST['unit']);
+    $qty  = intval($_POST['quantity']);
+    $price = intval($_POST['price']);
 
-    mysqli_query($conn, "INSERT INTO material (id_user,name,specification,unit,quantity,price) 
-                         VALUES ('$id_user','$name','$spec','$unit','$qty','$price')");
+    // setiap supplier otomatis menyimpan id_user
+    mysqli_query($conn, "INSERT INTO material (id_user, name, specification, unit, quantity, price) 
+                         VALUES ('$id_user', '$name', '$spec', '$unit', '$qty', '$price')");
     echo "<script>alert('Material berhasil ditambahkan!'); window.location='material.php';</script>";
 }
 
 // === DELETE MATERIAL ===
 if (isset($_GET['delete'])) {
-    $id = $_GET['delete'];
-    mysqli_query($conn, "DELETE FROM material WHERE id_material=$id");
-    echo "<script>alert('Material berhasil dihapus!'); window.location='material.php';</script>";
+    $id = intval($_GET['delete']);
+
+    // validasi: supplier hanya bisa hapus data miliknya
+    if ($role === 'supplier') {
+        $check = mysqli_query($conn, "SELECT id_user FROM material WHERE id_material='$id'");
+        $data = mysqli_fetch_assoc($check);
+        if ($data && $data['id_user'] == $id_user) {
+            mysqli_query($conn, "DELETE FROM material WHERE id_material='$id'");
+            echo "<script>alert('Material berhasil dihapus!'); window.location='material.php';</script>";
+        } else {
+            echo "<script>alert('❌ Anda tidak berhak menghapus material ini!'); window.location='material.php';</script>";
+        }
+    } else {
+        // admin bebas hapus semua
+        mysqli_query($conn, "DELETE FROM material WHERE id_material='$id'");
+        echo "<script>alert('Material berhasil dihapus!'); window.location='material.php';</script>";
+    }
 }
 
 // === FETCH DATA ===
-$result = mysqli_query($conn, "SELECT * FROM material ORDER BY id_material DESC");
+if ($role === 'supplier') {
+    // supplier hanya lihat data miliknya
+    $result = mysqli_query($conn, "SELECT * FROM material WHERE id_user='$id_user' ORDER BY id_material DESC");
+} else {
+    // admin lihat semua data
+    $result = mysqli_query($conn, "SELECT m.*, u.nama AS supplier_name 
+                                   FROM material m 
+                                   LEFT JOIN users u ON m.id_user = u.id_user
+                                   ORDER BY m.id_material DESC");
+}
 ?>
 
 <!DOCTYPE html>
@@ -47,7 +71,8 @@ $result = mysqli_query($conn, "SELECT * FROM material ORDER BY id_material DESC"
 <body style="background-color:#f3f6fa;">
 <div class="container-fluid mt-4">
   <div class="card shadow-lg border-0">
-    <div class="card-header bg-purple text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(90deg,#6610f2,#6f42c1);">
+    <div class="card-header text-white d-flex justify-content-between align-items-center" 
+         style="background: linear-gradient(90deg,#6610f2,#6f42c1);">
       <h4 class="mb-0"><i class="bi bi-box-seam"></i> Data Material</h4>
       <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createMaterial">
         ➕ Tambah Material
@@ -65,6 +90,7 @@ $result = mysqli_query($conn, "SELECT * FROM material ORDER BY id_material DESC"
               <th>Satuan</th>
               <th>Qty</th>
               <th>Harga</th>
+              <?php if ($role === 'admin'): ?><th>Supplier</th><?php endif; ?>
               <th>Aksi</th>
             </tr>
           </thead>
@@ -77,18 +103,23 @@ $result = mysqli_query($conn, "SELECT * FROM material ORDER BY id_material DESC"
                 <td class="text-center"><?= htmlspecialchars($m['unit']) ?></td>
                 <td class="text-center"><?= number_format($m['quantity']) ?></td>
                 <td class="text-end">Rp <?= number_format($m['price']) ?></td>
+                <?php if ($role === 'admin'): ?>
+                  <td class="text-center"><?= htmlspecialchars($m['supplier_name'] ?? '-') ?></td>
+                <?php endif; ?>
                 <td class="text-center">
                   <a href="detailmaterial.php?id=<?= $m['id_material'] ?>" class="btn btn-sm btn-outline-info">
                     <i class="bi bi-eye"></i> Detail
                   </a>
-                  <a href="?delete=<?= $m['id_material'] ?>" onclick="return confirm('Yakin hapus material ini?')" class="btn btn-sm btn-outline-danger">
+                  <a href="?delete=<?= $m['id_material'] ?>" 
+                     onclick="return confirm('Yakin hapus material ini?')" 
+                     class="btn btn-sm btn-outline-danger">
                     <i class="bi bi-trash"></i> Hapus
                   </a>
                 </td>
               </tr>
             <?php endwhile; ?>
             <?php if(mysqli_num_rows($result)==0): ?>
-              <tr><td colspan="7" class="text-center text-muted">Belum ada data material</td></tr>
+              <tr><td colspan="<?= $role === 'admin' ? '8' : '7' ?>" class="text-center text-muted">Belum ada data material</td></tr>
             <?php endif; ?>
           </tbody>
         </table>

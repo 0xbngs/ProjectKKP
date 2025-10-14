@@ -3,14 +3,14 @@
   <h5><?= ucfirst($role) ?> Menu</h5>
   <ul class="nav flex-column">
     <?php if($role === 'admin'): ?>
-      <li><a href="user.php" class="nav-link">User</a></li>
-      <li><a href="supplier.php" class="nav-link">Supplier</a></li>
+      <li><a href="../views/user.php" class="nav-link">User</a></li>
+      <li><a href="../views/supplier.php" class="nav-link">Supplier</a></li>
     <?php endif; ?>
 
     <?php if($role !== 'supplier'): ?>
-      <li><a href="rab.php" class="nav-link">RAB</a></li>
+      <li><a href="../rab/rab.php" class="nav-link">RAB</a></li>
     <?php endif; ?>
 
-    <li><a href="material.php" class="nav-link">Material</a></li>
+    <li><a href="../views/material.php" class="nav-link">Material</a></li>
   </ul>
 </div>
