@@ -18,7 +18,7 @@ if (!isset($_SESSION['id_user'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
   <style>
-    .category-block { background: #f8f9fa; }
+    .category-block { background: #f8f9fa; border-radius: 8px; padding: 16px; }
     .total-box { background: #fff3cd; font-weight: bold; border-radius: 8px; }
   </style>
 </head>
@@ -40,7 +40,7 @@ if (!isset($_SESSION['id_user'])) {
 
       <form method="POST" action="saverab.php">
         <div class="tab-content">
-          
+
           <!-- =================== TAB INFO =================== -->
           <div class="tab-pane fade show active" id="info">
             <div class="row mb-3">
@@ -64,8 +64,8 @@ if (!isset($_SESSION['id_user'])) {
           <!-- =================== TAB BUDGET =================== -->
           <div class="tab-pane fade" id="budget">
             <div id="budget-container"></div>
-            <button type="button" id="addCategory" class="btn btn-success mt-3">
-              <i class="bi bi-plus-circle"></i> Tambah Kategori
+            <button type="button" id="addCategoryBudget" class="btn btn-success mt-3">
+              <i class="bi bi-plus-circle"></i> Tambah Kategori Budget
             </button>
 
             <hr class="my-4">
@@ -85,7 +85,7 @@ if (!isset($_SESSION['id_user'])) {
             </div>
           </div>
 
-          <!-- =================== TAB ADDITIONAL (UPDATE) =================== -->
+          <!-- =================== TAB ADDITIONAL =================== -->
           <div class="tab-pane fade" id="additional">
             <div id="additional-container"></div>
             <button type="button" id="addCategoryAdditional" class="btn btn-outline-primary mt-3">
@@ -93,8 +93,6 @@ if (!isset($_SESSION['id_user'])) {
             </button>
 
             <hr class="my-4">
-
-            <!-- === FIELD TOTAL SEPERTI TAB BUDGET === -->
             <div class="row align-items-center">
               <div class="col-md-3">
                 <label class="fw-bold">Total Keseluruhan (Budget + Additional)</label>
@@ -114,7 +112,6 @@ if (!isset($_SESSION['id_user'])) {
               <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan RAB</button>
             </div>
           </div>
-
         </div>
       </form>
     </div>
@@ -130,7 +127,7 @@ if (!isset($_SESSION['id_user'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <input type="text" id="searchMaterial" class="form-control mb-3" placeholder="🔍 Cari nama material, spesifikasi, atau supplier...">
+        <input type="text" id="searchMaterial" class="form-control mb-3" placeholder="🔍 Cari material, spesifikasi, atau supplier...">
         <div class="table-responsive">
           <table class="table table-hover align-middle" id="tableMaterial">
             <thead class="table-primary text-center">
@@ -179,13 +176,15 @@ if (!isset($_SESSION['id_user'])) {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 let currentRow = null;
+let categoryIndex = 0;
 
-// ======== Modal Material ========
+// === Modal Material ===
 document.addEventListener('click', e => {
   if (e.target.closest('.openMaterialModal')) {
     currentRow = e.target.closest('.row');
   }
 });
+
 document.addEventListener('click', e => {
   if (e.target.classList.contains('selectMaterial')) {
     const name = e.target.dataset.name;
@@ -193,136 +192,95 @@ document.addEventListener('click', e => {
     const price = e.target.dataset.price;
     if (currentRow) {
       currentRow.querySelector('.material-input').value = name;
-      currentRow.querySelector('input[name="unit[]"]').value = unit;
-      currentRow.querySelector('input[name="unit_price[]"]').value = price;
-      currentRow.querySelector('input[name="quantity[]"]').value = 1;
+      currentRow.querySelector('.unit-input').value = unit;
+      currentRow.querySelector('.price-input').value = price;
+      currentRow.querySelector('.qty-input').value = 1;
       updateTotal(currentRow);
     }
     bootstrap.Modal.getInstance(document.getElementById('materialModal')).hide();
   }
 });
 
-// ======== Tambah Kategori ========
-document.getElementById('addCategory').addEventListener('click', () => addCategory('budget-container'));
-document.getElementById('addCategoryAdditional').addEventListener('click', () => addCategory('additional-container'));
+// === Tambah Kategori Budget/Additional ===
+document.getElementById('addCategoryBudget').addEventListener('click', () => addCategory('budget-container', 'budget'));
+document.getElementById('addCategoryAdditional').addEventListener('click', () => addCategory('additional-container', 'additional'));
 
-function addCategory(containerId) {
+function addCategory(containerId, tabType) {
   const container = document.getElementById(containerId);
+  const idx = categoryIndex++;
   const block = document.createElement('div');
-  block.className = 'category-block border p-3 mb-4 rounded';
+  block.className = 'category-block mb-4';
   block.innerHTML = `
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <input type="text" name="category[]" class="form-control w-50" placeholder="Nama Kategori">
-      <button type="button" class="btn btn-outline-danger btn-sm removeCategory">🗑 Hapus Kategori</button>
+      <input type="text" name="category[${tabType}][${idx}][name]" class="form-control w-50" placeholder="Nama Kategori">
+      <button type="button" class="btn btn-outline-danger btn-sm removeCategory">🗑 Hapus</button>
     </div>
-    <div class="category-items"></div>
-    <div class="mt-2"><button type="button" class="btn btn-outline-primary btn-sm addItem"><i class="bi bi-plus"></i> Tambah Material</button></div>
+    <div class="category-items" data-cat="${idx}" data-type="${tabType}"></div>
+    <button type="button" class="btn btn-outline-primary btn-sm addItem mt-2" data-cat="${idx}" data-type="${tabType}">
+      <i class="bi bi-plus"></i> Tambah Material
+    </button>
     <div class="text-end mt-3"><b>Total Kategori:</b> <span class="catTotal">0</span></div>
   `;
   container.appendChild(block);
 }
 
-// ======== Tambah Material ========
+// === Tambah Material ===
 document.addEventListener('click', e => {
   if (e.target.classList.contains('addItem')) {
+    const cat = e.target.dataset.cat;
+    const type = e.target.dataset.type;
+    const container = e.target.closest('.category-block').querySelector('.category-items');
+    const materialIndex = container.querySelectorAll('.row').length;
+
     const row = document.createElement('div');
     row.className = 'row mb-2 align-items-center';
     row.innerHTML = `
       <div class="col-md-3 d-flex align-items-center">
-        <input name="material_name[]" class="form-control me-1 material-input" placeholder="Ketik atau pilih material...">
+        <input name="category[${type}][${cat}][materials][${materialIndex}][material_name]" class="form-control me-1 material-input" placeholder="Pilih material...">
         <button type="button" class="btn btn-outline-primary btn-sm openMaterialModal" data-bs-toggle="modal" data-bs-target="#materialModal">
           <i class="bi bi-search"></i>
         </button>
       </div>
-      <div class="col-md-1"><input name="unit[]" class="form-control" placeholder="Unit"></div>
-      <div class="col-md-1"><input name="quantity[]" type="number" class="form-control qty" placeholder="Qty" value="1" min="1"></div>
-      <div class="col-md-2"><input name="unit_price[]" type="number" class="form-control unitprice" placeholder="Harga"></div>
-      <div class="col-md-2"><input name="total_cost[]" type="number" class="form-control total text-end" placeholder="Total" readonly></div>
+      <div class="col-md-1"><input name="category[${type}][${cat}][materials][${materialIndex}][unit]" class="form-control unit-input" placeholder="Unit"></div>
+      <div class="col-md-1"><input name="category[${type}][${cat}][materials][${materialIndex}][quantity]" type="number" class="form-control qty-input" value="1" min="1"></div>
+      <div class="col-md-2"><input name="category[${type}][${cat}][materials][${materialIndex}][unit_price]" type="number" class="form-control price-input" placeholder="Harga"></div>
+      <div class="col-md-2"><input name="category[${type}][${cat}][materials][${materialIndex}][total_cost]" type="number" class="form-control total text-end" readonly></div>
       <div class="col-md-1 text-center"><button type="button" class="btn btn-outline-danger btn-sm removeItem">🗑</button></div>
     `;
-    e.target.closest('.category-block').querySelector('.category-items').appendChild(row);
+    container.appendChild(row);
   }
 });
 
-// ======== Hapus Item / Kategori ========
+// === Hapus Item / Kategori ===
 document.addEventListener('click', e => {
   if (e.target.classList.contains('removeCategory')) e.target.closest('.category-block').remove();
   if (e.target.classList.contains('removeItem')) e.target.closest('.row').remove();
   calculateAll();
 });
 
-// ======== Kalkulasi ========
+// === Kalkulasi ===
 document.addEventListener('input', e => {
-  if (e.target.classList.contains('qty') || e.target.classList.contains('unitprice')) updateTotal(e.target.closest('.row'));
-  if (e.target.id === 'unit') updateAdditionalTotals();
-  if (e.target.id === 'pembulatan' || e.target.id === 'unit') calculatePerMeter();
-  if (e.target.id === 'pembulatanAdditional') calculatePerMeterAdditional();
+  if (e.target.classList.contains('qty-input') || e.target.classList.contains('price-input')) updateTotal(e.target.closest('.row'));
 });
 
 function updateTotal(row) {
-  const qty = parseFloat(row.querySelector('.qty')?.value || 0);
-  const price = parseFloat(row.querySelector('.unitprice')?.value || 0);
-  const container = row.closest('.tab-pane');
-  const totalInput = row.querySelector('.total');
-  if (container && container.id === 'additional') {
-    const unitCount = parseFloat(document.getElementById('unit').value || 1);
-    const total = unitCount > 0 ? (qty * price) / unitCount : qty * price;
-    totalInput.value = total;
-  } else totalInput.value = qty * price;
+  const qty = parseFloat(row.querySelector('.qty-input')?.value || 0);
+  const price = parseFloat(row.querySelector('.price-input')?.value || 0);
+  row.querySelector('.total').value = qty * price;
   calculateAll();
 }
 
 function calculateAll() {
-  // === Hitung total Budget ===
   let grand = 0;
-  document.querySelectorAll('#budget-container .category-block').forEach(cat => {
+  document.querySelectorAll('.category-block').forEach(cat => {
     let subtotal = 0;
     cat.querySelectorAll('.total').forEach(t => subtotal += parseFloat(t.value || 0));
     cat.querySelector('.catTotal').textContent = subtotal.toLocaleString('id-ID');
     grand += subtotal;
   });
   document.getElementById('grandTotal').value = grand.toLocaleString('id-ID');
-
-  // === Hitung total Additional ===
-  updateAdditionalTotals(grand);
-  calculatePerMeter();
+  document.getElementById('grandTotalAdditional').value = grand.toLocaleString('id-ID');
 }
-
-function updateAdditionalTotals(grandBudget = 0) {
-  let grandAdd = 0;
-  document.querySelectorAll('#additional-container .category-block').forEach(cat => {
-    let subtotal = 0;
-    cat.querySelectorAll('.total').forEach(input => subtotal += parseFloat(input.value || 0));
-    cat.querySelector('.catTotal').textContent = subtotal.toLocaleString('id-ID');
-    grandAdd += subtotal;
-  });
-
-  const totalAll = grandBudget + grandAdd;
-  document.getElementById('grandTotalAdditional').value = totalAll.toLocaleString('id-ID');
-  calculatePerMeterAdditional();
-}
-
-function calculatePerMeter() {
-  const pembulatan = parseFloat(document.getElementById('pembulatan').value || 0);
-  const type = parseFloat(document.getElementById('type').value || 0);
-  const perMeter = type > 0 ? pembulatan / type : 0;
-  document.getElementById('permeter').value = perMeter.toLocaleString('id-ID', { maximumFractionDigits: 2 });
-}
-
-function calculatePerMeterAdditional() {
-  const pembulatanAdd = parseFloat(document.getElementById('pembulatanAdditional').value || 0);
-  const type = parseFloat(document.getElementById('type').value || 0);
-  const perMeterAdd = type > 0 ? pembulatanAdd / type : 0;
-  document.getElementById('permeterAdditional').value = perMeterAdd.toLocaleString('id-ID', { maximumFractionDigits: 2 });
-}
-
-// ======== Search Material ========
-document.getElementById('searchMaterial').addEventListener('keyup', function() {
-  const val = this.value.toLowerCase();
-  document.querySelectorAll('#tableMaterial tbody tr').forEach(row => {
-    row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
-  });
-});
 </script>
 </body>
 </html>
