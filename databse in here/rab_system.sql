@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 14, 2025 at 11:57 AM
+-- Generation Time: Oct 18, 2025 at 09:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -85,6 +85,7 @@ INSERT INTO `material` (`id_material`, `id_user`, `name`, `specification`, `unit
 
 CREATE TABLE `rab` (
   `id_rab` varchar(50) NOT NULL,
+  `parent_id` varchar(50) DEFAULT NULL,
   `id_user` int(11) DEFAULT NULL,
   `project_name` varchar(100) DEFAULT NULL,
   `unit` int(11) DEFAULT NULL,
@@ -96,20 +97,37 @@ CREATE TABLE `rab` (
   `pembulatan` int(11) DEFAULT 0,
   `permeterpersegi` int(11) DEFAULT 0,
   `timestamps` timestamp NOT NULL DEFAULT current_timestamp(),
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `version_created_at` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `rab`
 --
 
-INSERT INTO `rab` (`id_rab`, `id_user`, `project_name`, `unit`, `type`, `location`, `notes`, `additional_info`, `jumlahTotal`, `pembulatan`, `permeterpersegi`, `timestamps`, `created_at`) VALUES
-('RAB-68edf61698053', 1, 'testing', 1, 'a2', 'jakarte', NULL, NULL, 0, 0, 0, '2025-10-14 07:04:54', '2025-10-14 07:04:54'),
-('RAB-68edf68eb5487', 1, 'Tester cuyys', 1, 'a22', 'jakartea', NULL, NULL, 0, 0, 0, '2025-10-14 07:06:54', '2025-10-14 07:06:54'),
-('RAB-68edf7f12326d', 1, 'tester1', 1, '3', 'bandung', NULL, NULL, 0, 0, 0, '2025-10-14 07:12:49', '2025-10-14 07:12:49'),
-('RAB-68ee16b599025', 1, 'testing3', 1, '9', 'medan', 'maling besi', 'aobvuabov', 0, 0, 0, '2025-10-14 09:24:05', '2025-10-14 09:24:05'),
-('RAB-68ee177f009e1', 1, 'TestingBambang', 1, '19', 'Jajargenjang', 'tambahin aja', 'aovniavav', 0, 0, 0, '2025-10-14 09:27:27', '2025-10-14 09:27:27'),
-('RAB-68ee1db488d3a', 1, 'testerrrrr90', 1, '45', 'jajargenjangdua', 'dimana aja', 'advdavav', 0, 0, 0, '2025-10-14 09:53:56', '2025-10-14 09:53:56');
+INSERT INTO `rab` (`id_rab`, `parent_id`, `id_user`, `project_name`, `unit`, `type`, `location`, `notes`, `additional_info`, `jumlahTotal`, `pembulatan`, `permeterpersegi`, `timestamps`, `created_at`, `version_created_at`) VALUES
+('RAB-68edf61698053', 'RAB-68edf61698053', 1, 'testing', 1, 'a2', 'jakarte', NULL, NULL, 0, 0, 0, '2025-10-14 07:04:54', '2025-10-14 07:04:54', '2025-10-18 12:10:51'),
+('RAB-68edf68eb5487', 'RAB-68edf68eb5487', 1, 'Tester cuyys', 1, 'a22', 'jakartea', NULL, NULL, 0, 0, 0, '2025-10-14 07:06:54', '2025-10-14 07:06:54', '2025-10-18 12:10:51'),
+('RAB-68edf7f12326d', 'RAB-68edf7f12326d', 1, 'tester1', 1, '3', 'bandung', NULL, NULL, 0, 0, 0, '2025-10-14 07:12:49', '2025-10-14 07:12:49', '2025-10-18 12:10:51'),
+('RAB-68ee16b599025', 'RAB-68ee16b599025', 1, 'testing3', 1, '9', 'medan', 'maling besi', 'aobvuabov', 0, 0, 0, '2025-10-14 09:24:05', '2025-10-14 09:24:05', '2025-10-18 12:10:51'),
+('RAB-68ee177f009e1', 'RAB-68ee177f009e1', 1, 'TestingBambang', 1, '19', 'Jajargenjang', 'tambahin aja', 'aovniavav', 0, 0, 0, '2025-10-14 09:27:27', '2025-10-14 09:27:27', '2025-10-18 12:10:51'),
+('RAB-68ee1db488d3a', 'RAB-68ee1db488d3a', 1, 'testerrrrr90', 1, '45', 'jajargenjangdua', 'dimana aja', 'advdavav', 0, 0, 0, '2025-10-14 09:53:56', '2025-10-14 09:53:56', '2025-10-18 12:10:51'),
+('RAB-68ee2495c7fa8', 'RAB-68ee2495c7fa8', 1, 'RABADIK', 1, '67', 'layanglayang', 'mana ada ko repoo', '', 0, 0, 0, '2025-10-14 10:23:17', '2025-10-14 10:23:17', '2025-10-18 12:10:51'),
+('RAB-68ee28ce31b76', 'RAB-68ee28ce31b76', 1, 'teeessscuyy', 1, '123', 'layanglayanggenjang', 'kumala', 'vabarbar', 0, 0, 0, '2025-10-14 10:41:18', '2025-10-14 10:41:18', '2025-10-18 12:10:51'),
+('RAB-68f2fd8dbb03f', 'RAB-68f2fd8dbb03f', 1, 'Testing', 1, '300', 'Bandung', 'test', '', 0, 0, 0, '2025-10-18 02:38:05', '2025-10-18 02:38:05', '2025-10-18 12:10:51'),
+('RAB-68f30409a2bf4', 'RAB-68f30409a2bf4', 1, 'testingg', 67, '120', 'condet', 'Rumah Modern', '', 0, 0, 0, '2025-10-18 03:05:45', '2025-10-18 03:05:45', '2025-10-18 12:10:51'),
+('RAB-68f3126aaa0b4', 'RAB-68f3126aaa0b4', 1, 'Perumahan Kalibaru permai', 1, '34', 'Depok, Jawa Barat, Indonesia', '', '', 0, 0, 0, '2025-10-18 04:07:06', '2025-10-18 04:07:06', '2025-10-18 12:10:51'),
+('RAB-68f318d2b4991', 'RAB-68f318d2b4991', 1, 'Finalproject', 1, '120', 'Condet', 'Rumah modern', '', 0, 0, 0, '2025-10-18 04:34:26', '2025-10-18 04:34:26', '2025-10-18 12:10:51'),
+('RAB-68f318d2b4991-REV-20251018-065144', 'RAB-68f318d2b4991-REV-20251018-065144', 1, 'Finalproject', 1, '120', 'Condet', 'Rumah modern', NULL, 0, 0, 0, '2025-10-18 04:51:44', '2025-10-18 04:51:44', '2025-10-18 12:10:51'),
+('RAB-68f323e97062d', NULL, 1, 'Contohmasroy', 1, '90', 'Condet', 'Modern home', '', 0, 0, 0, '2025-10-18 05:21:45', '2025-10-18 05:21:45', '2025-10-18 12:21:45'),
+('RAB-68f32824bef2e', NULL, 1, 'bikin baru', 1, '3', 'bogor', 'testing rab type 3 number 10 location bogot', '', 0, 0, 0, '2025-10-18 05:39:48', '2025-10-18 05:39:48', '2025-10-18 12:39:48'),
+('RAB-68f32c4c74c94', NULL, 1, 'abiyu', 1, '9', 'cibinong', 'bogor', '', 0, 0, 0, '2025-10-18 05:57:32', '2025-10-18 05:57:32', '2025-10-18 12:57:32'),
+('RAB-68f334cf4b95a', NULL, 1, 'Testerfix', 1, '120', 'bandung', 'modern home', '', 0, 0, 0, '2025-10-18 06:33:51', '2025-10-18 06:33:51', '2025-10-18 13:33:51'),
+('RAB-68f334cf4b95a-REV-20251018-091514', 'RAB-68f334cf4b95a', 1, 'Testerfixxxx', 1, '120', 'bandung', 'modern home', NULL, 1239044, 1239000, 10325, '2025-10-18 07:15:14', '2025-10-18 07:15:14', '2025-10-18 14:15:14'),
+('RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', 'RAB-68f334cf4b95a-REV-20251018-091514', 1, 'Testerfixxxxccc', 1, '120', 'bandung', 'modern home', NULL, 0, 0, 0, '2025-10-18 07:23:05', '2025-10-18 07:23:05', '2025-10-18 14:23:05'),
+('RAB-68f337e29ca30', NULL, 1, 'coba1', 91, '76', 'depok', 'modern home', NULL, 5158000, 5158000, 67868, '2025-10-18 06:46:58', '2025-10-18 06:46:58', '2025-10-18 13:46:58'),
+('RAB-68f337e29ca30-REV-20251018-090241', 'RAB-68f337e29ca30', 1, 'coba1', 91, '76', 'depok', 'modern home biyu', NULL, 5158000, 5158000, 67868, '2025-10-18 07:02:41', '2025-10-18 07:02:41', '2025-10-18 14:02:41'),
+('RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', 'RAB-68f337e29ca30-REV-20251018-090241', 1, 'coba1', 92, '76', 'depok', 'modern home biyu', NULL, 0, 0, 0, '2025-10-18 07:03:06', '2025-10-18 07:03:06', '2025-10-18 14:03:06');
 
 -- --------------------------------------------------------
 
@@ -155,7 +173,127 @@ INSERT INTO `rab_detail` (`id`, `id_rab`, `id_material`, `category`, `material_n
 (20, 'RAB-68ee1db488d3a', NULL, 'aevavadv', 'baja ringan banget cuyyhh', '10 meter', 1, 75000, 75000, '2025-10-14 09:53:56'),
 (21, 'RAB-68ee1db488d3a', NULL, '', 'Pipa PVC 3 inch', 'batang', 1, 45000, 45000, '2025-10-14 09:53:56'),
 (22, 'RAB-68ee1db488d3a', NULL, '', 'Besi Beton', 'batang', 1, 60000, 60000, '2025-10-14 09:53:56'),
-(23, 'RAB-68ee1db488d3a', NULL, '', 'Cat Nippon Paint', 'kaleng', 1, 145000, 145000, '2025-10-14 09:53:56');
+(23, 'RAB-68ee1db488d3a', NULL, '', 'Cat Nippon Paint', 'kaleng', 1, 145000, 145000, '2025-10-14 09:53:56'),
+(24, 'RAB-68ee2495c7fa8', NULL, 'PONDASIII', 'Besi Beton', 'batang', 3, 60000, 60000, '2025-10-14 10:23:17'),
+(25, 'RAB-68ee2495c7fa8', NULL, 'tembok', 'Besi Hollow', 'batang', 3, 78000, 78000, '2025-10-14 10:23:17'),
+(26, 'RAB-68ee2495c7fa8', NULL, '', 'Kran Taman', 'buah', 5, 75000, 75000, '2025-10-14 10:23:17'),
+(27, 'RAB-68ee2495c7fa8', NULL, '', 'Batu Bata Merah', 'buah', 6, 800, 800, '2025-10-14 10:23:17'),
+(28, 'RAB-68ee2495c7fa8', NULL, '', 'Paku', 'kg', 6, 25000, 25000, '2025-10-14 10:23:17'),
+(29, 'RAB-68ee2495c7fa8', NULL, '', 'semen', 'sak', 4, 80000, 80000, '2025-10-14 10:23:17'),
+(30, 'RAB-68ee28ce31b76', NULL, 'PONDASIII', 'Batu Kali', 'truk', 2, 900000, 1800000, '2025-10-14 10:41:18'),
+(31, 'RAB-68ee28ce31b76', NULL, 'tembok', 'Keramik Lantai', 'dus', 3, 95000, 285000, '2025-10-14 10:41:18'),
+(32, 'RAB-68ee28ce31b76', NULL, '', 'Cat Eksterior', 'kaleng', 4, 180000, 720000, '2025-10-14 10:41:18'),
+(33, 'RAB-68ee28ce31b76', NULL, '', 'baja ringan banget', '10 meter', 6, 75000, 450000, '2025-10-14 10:41:18'),
+(34, 'RAB-68ee28ce31b76', NULL, '', 'Stop Kontak', 'buah', 11, 18000, 198000, '2025-10-14 10:41:18'),
+(35, 'RAB-68ee28ce31b76', NULL, '', 'Las Listrik', 'kotak', 5, 34000, 170000, '2025-10-14 10:41:18'),
+(36, 'RAB-68f2fd8dbb03f', NULL, 'Pondasi', 'Batu Kali', 'pcs', 6, 10000, 60000, '2025-10-18 02:38:05'),
+(37, 'RAB-68f2fd8dbb03f', NULL, 'Lantai', 'Besi Hollow', 'batang', 1, 78003, 78003, '2025-10-18 02:38:05'),
+(38, 'RAB-68f2fd8dbb03f', NULL, '', 'pasir', '5 sak', 1, 100000, 100000, '2025-10-18 02:38:05'),
+(39, 'RAB-68f3126aaa0b4', NULL, 'Pembuatan Pintu', 'Cat Eksterior', 'kaleng', 3, 180000, 540000, '2025-10-18 04:07:06'),
+(40, 'RAB-68f3126aaa0b4', NULL, 'Pembuatan Jendela', 'Besi Siku', 'batang', 2, 120000, 240000, '2025-10-18 04:07:06'),
+(41, 'RAB-68f3126aaa0b4', NULL, '', 'Kawat Bendrat', 'kg', 4, 18000, 72000, '2025-10-18 04:07:06'),
+(42, 'RAB-68f3126aaa0b4', NULL, '', 'Kayu Balok', 'batang', 3, 95000, 285000, '2025-10-18 04:07:06'),
+(43, 'RAB-68f3126aaa0b4', NULL, '', 'Granit Tile', 'dus', 5, 145000, 11693, '2025-10-18 04:07:06'),
+(44, 'RAB-68f3126aaa0b4', NULL, '', 'Besi Beton', 'batang', 1, 12000000, 193548, '2025-10-18 04:07:06'),
+(45, 'RAB-68f318d2b4991', NULL, 'Atap', 'Batu Kali', 'truk', 1, 850000, 850000, '2025-10-18 04:34:26'),
+(46, 'RAB-68f318d2b4991', NULL, 'lantai', 'Besi Beton', 'batang', 1, 60000, 60000, '2025-10-18 04:34:26'),
+(47, 'RAB-68f318d2b4991', NULL, 'Pondasi', 'Batu Kali', 'truk', 1, 850000, 10625, '2025-10-18 04:34:26'),
+(48, 'RAB-68f318d2b4991', NULL, 'lantai', 'Besi Hollow', 'batang', 1, 78000, 975, '2025-10-18 04:34:26'),
+(49, 'RAB-68f318d2b4991', NULL, '', 'Cat Kayu', 'kaleng', 1, 120000, 1500, '2025-10-18 04:34:26'),
+(50, 'RAB-68f318d2b4991-REV-20251018-065144', NULL, 'Atap', 'Batu Kali', 'truk', 1, 850000, 850000, '2025-10-18 04:51:44'),
+(51, 'RAB-68f318d2b4991-REV-20251018-065144', NULL, 'lantai', 'Besi Beton', 'batang', 1, 60000, 60000, '2025-10-18 04:51:44'),
+(52, 'RAB-68f318d2b4991-REV-20251018-065144', NULL, 'Pondasi', 'Batu Kali', 'truk', 1, 850000, 10625, '2025-10-18 04:51:44'),
+(53, 'RAB-68f318d2b4991-REV-20251018-065144', NULL, 'lantai', 'Besi Hollow', 'batang', 1, 78000, 975, '2025-10-18 04:51:44'),
+(54, 'RAB-68f318d2b4991-REV-20251018-065144', NULL, '', 'Cat Kayu', 'kaleng', 1, 120000, 1500, '2025-10-18 04:51:44'),
+(55, 'RAB-68f323e97062d', NULL, 'Atap', 'Genteng', 'pcs', 2, 90000, 180000, '2025-10-18 05:21:45'),
+(56, 'RAB-68f323e97062d', NULL, 'Tembok', 'Cat Anti Karat', 'kaleng', 3, 160000, 480000, '2025-10-18 05:21:45'),
+(57, 'RAB-68f323e97062d', NULL, 'Kanopi', 'Paku', 'kg', 1, 25000, 25000, '2025-10-18 05:21:45'),
+(58, 'RAB-68f323e97062d', NULL, 'pagar', 'Batu Bata Merah', 'buah', 106, 800, 84800, '2025-10-18 05:21:45'),
+(59, 'RAB-68f323e97062d', NULL, '', 'Kayu Balok', 'batang', 4, 95000, 380000, '2025-10-18 05:21:45'),
+(60, 'RAB-68f323e97062d', NULL, '', 'Besi Siku', 'batang', 5, 120000, 8955, '2025-10-18 05:21:45'),
+(61, 'RAB-68f323e97062d', NULL, '', 'Plat Besi', 'lembar', 20, 260000, 77611, '2025-10-18 05:21:45'),
+(62, 'RAB-68f323e97062d', NULL, '', 'baja ringan banget', '10 meter', 20, 75000, 22388, '2025-10-18 05:21:45'),
+(63, 'RAB-68f32824bef2e', NULL, 'pintu', 'Pintu Kayu', 'unit', 1, 950000, 950000, '2025-10-18 05:39:48'),
+(64, 'RAB-68f32824bef2e', NULL, 'pagar', 'Cat Kayu', 'kaleng', 1, 120000, 120000, '2025-10-18 05:39:48'),
+(65, 'RAB-68f32824bef2e', NULL, '', 'Besi Hollow', 'batang', 1, 78000, 7800, '2025-10-18 05:39:48'),
+(66, 'RAB-68f32c4c74c94', NULL, 'PONDASI', 'Besi Siku', 'batang', 1, 120000, 120000, '2025-10-18 05:57:32'),
+(67, 'RAB-68f32c4c74c94', NULL, 'Atap', 'baja ringan banget', '10 meter', 1, 75000, 7500, '2025-10-18 05:57:32'),
+(68, 'RAB-68f334cf4b95a', NULL, 'Pondasi', 'Batu Bata Merah', 'buah', 500, 800, 400000, '2025-10-18 06:33:51'),
+(69, 'RAB-68f334cf4b95a', NULL, 'Kanopi', 'Keramik Lantai', 'dus', 5, 95000, 475000, '2025-10-18 06:33:51'),
+(70, 'RAB-68f334cf4b95a', NULL, '', 'Cat Kayu', 'kaleng', 3, 120000, 360000, '2025-10-18 06:33:51'),
+(71, 'RAB-68f334cf4b95a', NULL, '', 'Besi Siku', 'batang', 3, 120000, 4044, '2025-10-18 06:33:51'),
+(72, 'RAB-68f337e29ca30', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 06:46:58'),
+(73, 'RAB-68f337e29ca30', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 06:46:58'),
+(74, 'RAB-68f337e29ca30', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 06:46:58'),
+(75, 'RAB-68f337e29ca30', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 06:46:58'),
+(76, 'RAB-68f337e29ca30', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 06:46:58'),
+(77, 'RAB-68f337e29ca30', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 06:46:58'),
+(78, 'RAB-68f337e29ca30-REV-20251018-090241', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:02:41'),
+(79, 'RAB-68f337e29ca30-REV-20251018-090241', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:02:41'),
+(80, 'RAB-68f337e29ca30-REV-20251018-090241', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:02:41'),
+(81, 'RAB-68f337e29ca30-REV-20251018-090241', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:02:41'),
+(82, 'RAB-68f337e29ca30-REV-20251018-090241', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:02:41'),
+(83, 'RAB-68f337e29ca30-REV-20251018-090241', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:02:41'),
+(84, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:03:06'),
+(85, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:03:06'),
+(86, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:03:06'),
+(87, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:03:06'),
+(88, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:03:06'),
+(89, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:03:06'),
+(90, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:10:40'),
+(91, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:10:40'),
+(92, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:10:40'),
+(93, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:10:40'),
+(94, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:10:40'),
+(95, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:10:40'),
+(96, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:10:53'),
+(97, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:10:53'),
+(98, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:10:53'),
+(99, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:10:53'),
+(100, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:10:53'),
+(101, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:10:53'),
+(102, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:10:53'),
+(103, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:10:53'),
+(104, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:10:53'),
+(105, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:10:53'),
+(106, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:10:53'),
+(107, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:10:53'),
+(108, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:11:20'),
+(109, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:11:20'),
+(110, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:11:20'),
+(111, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:11:20'),
+(112, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:11:20'),
+(113, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:11:20'),
+(114, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:11:20'),
+(115, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:11:20'),
+(116, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:11:20'),
+(117, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:11:20'),
+(118, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:11:20'),
+(119, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:11:20'),
+(120, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:11:20'),
+(121, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:11:20'),
+(122, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:11:20'),
+(123, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:11:20'),
+(124, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:11:20'),
+(125, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:11:20'),
+(126, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Besi Siku', 'batang', 3, 120000, 360000, '2025-10-18 07:11:20'),
+(127, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'Aatap', 'Cat Kayu', 'kaleng', 4, 120000, 480000, '2025-10-18 07:11:20'),
+(128, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'semen', 'sak', 11, 80000, 880000, '2025-10-18 07:11:20'),
+(129, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'lantai', 'Plat Besi', 'lembar', 12, 260000, 3120000, '2025-10-18 07:11:20'),
+(130, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Cat Anti Karat', 'kaleng', 1, 160000, 160000, '2025-10-18 07:11:20'),
+(131, 'RAB-68f337e29ca30-REV-20251018-090241-REV-20251018', NULL, 'kanopi', 'Semen Tiga Roda', 'sak', 2, 79000, 158000, '2025-10-18 07:11:20'),
+(132, 'RAB-68f334cf4b95a-REV-20251018-091514', NULL, 'Pondasi', 'Batu Bata Merah', 'buah', 500, 800, 400000, '2025-10-18 07:15:14'),
+(133, 'RAB-68f334cf4b95a-REV-20251018-091514', NULL, 'Kanopi', 'Keramik Lantai', 'dus', 5, 95000, 475000, '2025-10-18 07:15:14'),
+(134, 'RAB-68f334cf4b95a-REV-20251018-091514', NULL, '', 'Cat Kayu', 'kaleng', 3, 120000, 360000, '2025-10-18 07:15:14'),
+(135, 'RAB-68f334cf4b95a-REV-20251018-091514', NULL, '', 'Besi Siku', 'batang', 3, 120000, 4044, '2025-10-18 07:15:14'),
+(136, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, 'Pondasi', 'Batu Bata Merah', 'buah', 500, 800, 400000, '2025-10-18 07:23:05'),
+(137, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, 'Kanopi', 'Keramik Lantai', 'dus', 5, 95000, 475000, '2025-10-18 07:23:05'),
+(138, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, '', 'Cat Kayu', 'kaleng', 3, 120000, 360000, '2025-10-18 07:23:05'),
+(139, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, '', 'Besi Siku', 'batang', 3, 120000, 4044, '2025-10-18 07:23:05'),
+(140, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, 'atap', 'Cat Kayu', 'kaleng', 5, 120000, 600000, '2025-10-18 07:25:49'),
+(141, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, 'atap', 'Besi Siku', 'batang', 5, 120000, 600000, '2025-10-18 07:25:49'),
+(142, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, 'Kanopi', 'Keramik Lantai', 'dus', 5, 95000, 475000, '2025-10-18 07:25:49'),
+(143, 'RAB-68f334cf4b95a-REV-20251018-091514-REV-20251018', NULL, 'Pondasi', 'Batu Bata Merah', 'buah', 500, 800, 400000, '2025-10-18 07:25:49');
 
 -- --------------------------------------------------------
 
@@ -229,7 +367,7 @@ ALTER TABLE `material`
 -- AUTO_INCREMENT for table `rab_detail`
 --
 ALTER TABLE `rab_detail`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=144;
 
 --
 -- AUTO_INCREMENT for table `users`
