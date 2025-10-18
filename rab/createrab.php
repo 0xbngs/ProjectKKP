@@ -54,7 +54,7 @@ if (!isset($_SESSION['id_user'])) {
               </div>
               <div class="col-md-6">
                 <label>Number of Units</label>
-                <input type="number" name="unit" class="form-control mb-2" required>
+                <input type="number" name="unit" id="unit" class="form-control mb-2" required>
                 <label>Notes</label>
                 <textarea name="notes" class="form-control" placeholder="Keterangan tambahan..."></textarea>
               </div>
@@ -82,16 +82,39 @@ if (!isset($_SESSION['id_user'])) {
                 <label class="fw-bold">Per Meter Persegi</label>
                 <input type="text" id="permeter" class="form-control text-end" readonly>
               </div>
-              <div class="col-md-3 text-end">
-                <button type="submit" class="btn btn-success mt-3"><i class="bi bi-save"></i> Simpan RAB</button>
-              </div>
             </div>
           </div>
 
-          <!-- =================== TAB ADDITIONAL =================== -->
+          <!-- =================== TAB ADDITIONAL (UPDATE) =================== -->
           <div class="tab-pane fade" id="additional">
-            <textarea name="additional_info" class="form-control" rows="4" placeholder="Tambahan biaya lain atau catatan..."></textarea>
+            <div id="additional-container"></div>
+            <button type="button" id="addCategoryAdditional" class="btn btn-outline-primary mt-3">
+              <i class="bi bi-plus-circle"></i> Tambah Kategori (Additional)
+            </button>
+
+            <hr class="my-4">
+
+            <!-- === FIELD TOTAL SEPERTI TAB BUDGET === -->
+            <div class="row align-items-center">
+              <div class="col-md-3">
+                <label class="fw-bold">Total Keseluruhan (Budget + Additional)</label>
+                <input type="text" id="grandTotalAdditional" class="form-control total-box text-end" readonly>
+              </div>
+              <div class="col-md-3">
+                <label class="fw-bold">Pembulatan</label>
+                <input type="number" id="pembulatanAdditional" class="form-control text-end" value="0">
+              </div>
+              <div class="col-md-3">
+                <label class="fw-bold">Per Meter Persegi</label>
+                <input type="text" id="permeterAdditional" class="form-control text-end" readonly>
+              </div>
+            </div>
+
+            <div class="mt-4 text-end">
+              <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Simpan RAB</button>
+            </div>
           </div>
+
         </div>
       </form>
     </div>
@@ -103,11 +126,11 @@ if (!isset($_SESSION['id_user'])) {
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content shadow">
       <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title"><i class="bi bi-box-seam"></i> Pilih Material</h5>
+        <h5 class="modal-title" id="materialModalLabel"><i class="bi bi-box-seam"></i> Pilih Material</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <input type="text" id="searchMaterial" class="form-control mb-3" placeholder="Cari material...">
+        <input type="text" id="searchMaterial" class="form-control mb-3" placeholder="🔍 Cari nama material, spesifikasi, atau supplier...">
         <div class="table-responsive">
           <table class="table table-hover align-middle" id="tableMaterial">
             <thead class="table-primary text-center">
@@ -132,13 +155,17 @@ if (!isset($_SESSION['id_user'])) {
               <tr>
                 <td><?= htmlspecialchars($mat['name']) ?></td>
                 <td><?= htmlspecialchars($mat['specification']) ?></td>
-                <td><?= htmlspecialchars($mat['unit']) ?></td>
+                <td class="text-center"><?= htmlspecialchars($mat['unit']) ?></td>
                 <td class="text-end"><?= number_format($mat['price']) ?></td>
                 <td><?= htmlspecialchars($mat['supplier_name']) ?></td>
-                <td><button type="button" class="btn btn-success btn-sm selectMaterial"
-                  data-name="<?= htmlspecialchars($mat['name']) ?>"
-                  data-unit="<?= htmlspecialchars($mat['unit']) ?>"
-                  data-price="<?= htmlspecialchars($mat['price']) ?>">Pilih</button></td>
+                <td class="text-center">
+                  <button type="button" class="btn btn-success btn-sm selectMaterial"
+                    data-name="<?= htmlspecialchars($mat['name']) ?>"
+                    data-unit="<?= htmlspecialchars($mat['unit']) ?>"
+                    data-price="<?= htmlspecialchars($mat['price']) ?>">
+                    Pilih
+                  </button>
+                </td>
               </tr>
               <?php endwhile; ?>
             </tbody>
@@ -153,13 +180,12 @@ if (!isset($_SESSION['id_user'])) {
 <script>
 let currentRow = null;
 
-// Modal Material
+// ======== Modal Material ========
 document.addEventListener('click', e => {
   if (e.target.closest('.openMaterialModal')) {
     currentRow = e.target.closest('.row');
   }
 });
-
 document.addEventListener('click', e => {
   if (e.target.classList.contains('selectMaterial')) {
     const name = e.target.dataset.name;
@@ -176,9 +202,12 @@ document.addEventListener('click', e => {
   }
 });
 
-// Tambah kategori
-document.getElementById('addCategory').addEventListener('click', () => {
-  const container = document.getElementById('budget-container');
+// ======== Tambah Kategori ========
+document.getElementById('addCategory').addEventListener('click', () => addCategory('budget-container'));
+document.getElementById('addCategoryAdditional').addEventListener('click', () => addCategory('additional-container'));
+
+function addCategory(containerId) {
+  const container = document.getElementById(containerId);
   const block = document.createElement('div');
   block.className = 'category-block border p-3 mb-4 rounded';
   block.innerHTML = `
@@ -191,61 +220,86 @@ document.getElementById('addCategory').addEventListener('click', () => {
     <div class="text-end mt-3"><b>Total Kategori:</b> <span class="catTotal">0</span></div>
   `;
   container.appendChild(block);
-});
+}
 
-// Tambah material
+// ======== Tambah Material ========
 document.addEventListener('click', e => {
   if (e.target.classList.contains('addItem')) {
     const row = document.createElement('div');
     row.className = 'row mb-2 align-items-center';
     row.innerHTML = `
       <div class="col-md-3 d-flex align-items-center">
-        <input name="material_name[]" class="form-control me-1 material-input" placeholder="Material">
-        <button type="button" class="btn btn-outline-primary btn-sm openMaterialModal" data-bs-toggle="modal" data-bs-target="#materialModal"><i class="bi bi-search"></i></button>
+        <input name="material_name[]" class="form-control me-1 material-input" placeholder="Ketik atau pilih material...">
+        <button type="button" class="btn btn-outline-primary btn-sm openMaterialModal" data-bs-toggle="modal" data-bs-target="#materialModal">
+          <i class="bi bi-search"></i>
+        </button>
       </div>
       <div class="col-md-1"><input name="unit[]" class="form-control" placeholder="Unit"></div>
       <div class="col-md-1"><input name="quantity[]" type="number" class="form-control qty" placeholder="Qty" value="1" min="1"></div>
       <div class="col-md-2"><input name="unit_price[]" type="number" class="form-control unitprice" placeholder="Harga"></div>
       <div class="col-md-2"><input name="total_cost[]" type="number" class="form-control total text-end" placeholder="Total" readonly></div>
-      <div class="col-md-1"><button type="button" class="btn btn-outline-danger btn-sm removeItem">🗑</button></div>
+      <div class="col-md-1 text-center"><button type="button" class="btn btn-outline-danger btn-sm removeItem">🗑</button></div>
     `;
     e.target.closest('.category-block').querySelector('.category-items').appendChild(row);
   }
 });
 
-// Hapus kategori / item
+// ======== Hapus Item / Kategori ========
 document.addEventListener('click', e => {
   if (e.target.classList.contains('removeCategory')) e.target.closest('.category-block').remove();
   if (e.target.classList.contains('removeItem')) e.target.closest('.row').remove();
   calculateAll();
 });
 
-// Kalkulasi otomatis
+// ======== Kalkulasi ========
 document.addEventListener('input', e => {
-  if (e.target.classList.contains('qty') || e.target.classList.contains('unitprice')) {
-    updateTotal(e.target.closest('.row'));
-  }
-  if (e.target.id === 'pembulatan') calculatePerMeter();
+  if (e.target.classList.contains('qty') || e.target.classList.contains('unitprice')) updateTotal(e.target.closest('.row'));
+  if (e.target.id === 'unit') updateAdditionalTotals();
+  if (e.target.id === 'pembulatan' || e.target.id === 'unit') calculatePerMeter();
+  if (e.target.id === 'pembulatanAdditional') calculatePerMeterAdditional();
 });
 
 function updateTotal(row) {
   const qty = parseFloat(row.querySelector('.qty')?.value || 0);
   const price = parseFloat(row.querySelector('.unitprice')?.value || 0);
-  const total = qty * price;
-  row.querySelector('.total').value = total;
+  const container = row.closest('.tab-pane');
+  const totalInput = row.querySelector('.total');
+  if (container && container.id === 'additional') {
+    const unitCount = parseFloat(document.getElementById('unit').value || 1);
+    const total = unitCount > 0 ? (qty * price) / unitCount : qty * price;
+    totalInput.value = total;
+  } else totalInput.value = qty * price;
   calculateAll();
 }
 
 function calculateAll() {
+  // === Hitung total Budget ===
   let grand = 0;
-  document.querySelectorAll('.category-block').forEach(cat => {
+  document.querySelectorAll('#budget-container .category-block').forEach(cat => {
     let subtotal = 0;
     cat.querySelectorAll('.total').forEach(t => subtotal += parseFloat(t.value || 0));
     cat.querySelector('.catTotal').textContent = subtotal.toLocaleString('id-ID');
     grand += subtotal;
   });
   document.getElementById('grandTotal').value = grand.toLocaleString('id-ID');
+
+  // === Hitung total Additional ===
+  updateAdditionalTotals(grand);
   calculatePerMeter();
+}
+
+function updateAdditionalTotals(grandBudget = 0) {
+  let grandAdd = 0;
+  document.querySelectorAll('#additional-container .category-block').forEach(cat => {
+    let subtotal = 0;
+    cat.querySelectorAll('.total').forEach(input => subtotal += parseFloat(input.value || 0));
+    cat.querySelector('.catTotal').textContent = subtotal.toLocaleString('id-ID');
+    grandAdd += subtotal;
+  });
+
+  const totalAll = grandBudget + grandAdd;
+  document.getElementById('grandTotalAdditional').value = totalAll.toLocaleString('id-ID');
+  calculatePerMeterAdditional();
 }
 
 function calculatePerMeter() {
@@ -255,7 +309,14 @@ function calculatePerMeter() {
   document.getElementById('permeter').value = perMeter.toLocaleString('id-ID', { maximumFractionDigits: 2 });
 }
 
-// Search material modal
+function calculatePerMeterAdditional() {
+  const pembulatanAdd = parseFloat(document.getElementById('pembulatanAdditional').value || 0);
+  const type = parseFloat(document.getElementById('type').value || 0);
+  const perMeterAdd = type > 0 ? pembulatanAdd / type : 0;
+  document.getElementById('permeterAdditional').value = perMeterAdd.toLocaleString('id-ID', { maximumFractionDigits: 2 });
+}
+
+// ======== Search Material ========
 document.getElementById('searchMaterial').addEventListener('keyup', function() {
   const val = this.value.toLowerCase();
   document.querySelectorAll('#tableMaterial tbody tr').forEach(row => {
